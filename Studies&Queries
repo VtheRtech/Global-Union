@@ -4,6 +4,8 @@ https://www.sciencedirect.com/science/article/pii/S2210422421000654
 https://www.sciencedirect.com/science/article/abs/pii/S026137941100062X
 https://www.sciencedirect.com/science/article/abs/pii/S0016718519300995
 https://public.tableau.com/shared/5BC2Y8T23?:display_count=n&:origin=viz_share_link
+-------how to--------
+https://www.postgresql.org/docs/14/tutorial-window.html
 
 SELECT * FROM [Union Density by Country]
 ORDER BY [UnionDensity%] DESC
@@ -16,11 +18,20 @@ EXEC sp_rename 'dbo.[Union Density by Country].Trade union density rate (%)','Co
 DELETE FROM [Union Density by Country]
 WHERE [Country]='Reference area'
 
+---------Window Query-----------
+SELECT [country],[Year],[UnionDensity%]
+FROM
+	(SELECT [country],[Year],[UnionDensity%],
+		rank()OVER (PARTITION BY [Country] ORDER BY [YEAR] DESC,[UnionDensity%]) AS pos
+	FROM [Union Density by Country] WHERE [Country] is not null
+	) AS ss
+WHERE pos =1 ORDER BY [UnionDensity%] desc;
+
+
 SELECT [Country],MAX([Year]) AS 'Year',[UnionDensity%] AS 'Density'
 FROM [Union Density by Country]
 WHERE [Country] is not null and '[Country]'!='Reference area'
 GROUP BY [Country]
-
 
 
 
@@ -71,4 +82,6 @@ FROM [Union Density by Country]
 WHERE YEAR IS NOT NULL (SELECT [UnionDensity%]
 FROM [Union Density by Country]
 WHERE [UnionDensity%] IS NOT NULL)
+
+
 
